@@ -34,7 +34,20 @@ export default function LoginScreen({ onLogin, onSignUp }) {
       await authService.signIn(email, password);
       onLogin();
     } catch (error) {
-      Alert.alert('Error', error.message);
+      // User-friendly error messages
+      let errorMessage = 'An error occurred. Please try again.';
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+      } else if (error.message?.includes('Network request failed')) {
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and confirm your account before signing in.';
+      } else if (error.message?.includes('Too many requests')) {
+        errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+      }
+      
+      Alert.alert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
     }

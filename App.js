@@ -1,3 +1,9 @@
+/*
+ * CompuClass - Computer Learning Platform
+ * Copyright (c) 2025 Kamogelo Bambo, Thabo Khumalo, Lindokuhle Chili. All rights reserved.
+ * Unauthorized copying or distribution is prohibited.
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -29,11 +35,13 @@ import QuizDetailScreen from './screens/QuizDetailScreen';
 import StudentMaterialsScreen from './screens/StudentMaterialsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import Sidebar from './components/Sidebar';
+import OfflineIndicator from './components/OfflineIndicator';
 
 import { authService } from './services/authService';
 import { supabase } from './config/supabase';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { useOffline } from './hooks/useOffline';
+import { networkUtils } from './utils/networkUtils';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -213,12 +221,29 @@ function AppContent() {
 
   const checkUser = async () => {
     console.log('🔍 Checking user session...');
-    try {
-      // Force logout all users - remove this after first run
-      await supabase.auth.signOut();
+    
+    // Check network connectivity first
+    const isConnected = await networkUtils.checkConnectivity();
+    console.log('🌐 Network status:', isConnected ? 'Connected' : 'Offline');
+    
+    if (!isConnected) {
+      console.log('📱 Working offline, checking local session...');
+      try {
+        const offlineUser = await authService.getOfflineUser();
+        if (offlineUser && await authService.isSessionValid()) {
+          console.log('✅ Valid offline session found');
+          setUserRole('student'); // Default role for offline
+          setIsLoggedIn(true);
+          setIsFirstLaunch(false);
+        }
+      } catch (offlineError) {
+        console.error('❌ Offline user check failed:', offlineError);
+      }
       setLoading(false);
       return;
-      
+    }
+    
+    try {
       const { data: { session } } = await supabase.auth.getSession();
       console.log('📱 Session status:', session ? 'Active' : 'No session');
       
@@ -233,13 +258,26 @@ function AppContent() {
           console.log('✅ User authenticated successfully');
         }
       } else {
-        console.log('⚠️ No session found, signing out...');
-        await authService.signOut();
+        console.log('⚠️ No session found');
       }
     } catch (error) {
       console.error('❌ Error checking user:', error);
-      console.error('Error details:', error.message);
-      await authService.signOut();
+      
+      // Check if it's a network error
+      if (networkUtils.isNetworkError(error)) {
+        console.log('🌐 Network error detected, trying offline mode');
+        try {
+          const offlineUser = await authService.getOfflineUser();
+          if (offlineUser && await authService.isSessionValid()) {
+            console.log('📱 Using offline session');
+            setUserRole('student'); // Default role for offline
+            setIsLoggedIn(true);
+            setIsFirstLaunch(false);
+          }
+        } catch (offlineError) {
+          console.error('❌ Offline user check failed:', offlineError);
+        }
+      }
     } finally {
       setLoading(false);
       console.log('✅ App initialization complete');
@@ -356,6 +394,7 @@ function AppContent() {
         >
           <View style={{ flex: 1 }} {...panResponder.panHandlers}>
             <StatusBar style="dark" backgroundColor="#F0FDF4" />
+            <OfflineIndicator isVisible={!isOnline} />
             <Tab.Navigator
               tabBar={props => <CustomTabBar {...props} />}
               screenOptions={({ route }) => ({

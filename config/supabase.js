@@ -15,4 +15,15 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
   },
+  global: {
+    fetch: (url, options = {}) => {
+      return fetch(url, {
+        ...options,
+        timeout: 10000, // 10 second timeout
+      }).catch(error => {
+        console.error('Network request failed:', error);
+        throw new Error('Network request failed');
+      });
+    },
+  },
 });

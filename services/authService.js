@@ -39,7 +39,8 @@ export const authService = {
       
       if (error) {
         console.error('❌ Sign in error:', error.message);
-        throw error;
+        // Don't expose technical details to user
+        throw new Error(error.message);
       }
       
       await AsyncStorage.setItem('user', JSON.stringify(data.user));
@@ -66,20 +67,31 @@ export const authService = {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        if (error) {
-          console.error('❌ Get profile error:', error.message);
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          if (error && !error.message?.includes('Network request failed')) {
+            console.error('❌ Get profile error:', error.message);
+          }
+          return { ...user, profile };
+        } catch (profileError) {
+          console.warn('⚠️ Profile fetch failed, using user data only:', profileError.message);
+          return user;
         }
-        return { ...user, profile };
       }
       return user;
     } catch (error) {
       console.error('❌ Get current user exception:', error);
+      
+      // If it's a network error, try to get offline user
+      if (error.message?.includes('Network request failed')) {
+        console.log('🔄 Trying offline user data...');
+        return await this.getOfflineUser();
+      }
       throw error;
     }
   },
