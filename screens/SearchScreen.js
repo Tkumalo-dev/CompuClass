@@ -13,7 +13,7 @@ import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../config/supabase';
 import { downloadAsync, documentDirectory } from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-
+//Search screen for students to search quizzes and documents. Quizzes can be opened in quiz screen, documents can be downloaded and shared.
 export default function SearchScreen({ navigation }) {
   const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,7 +57,7 @@ export default function SearchScreen({ navigation }) {
       console.error('Download error:', error);
     }
   };
-
+// Render search input and results for quizzes and documents. Show loading indicator while searching and handle empty state when no results are found.
   return (
     <View style={[styles.container, { backgroundColor: theme.surface }]}>
       <View style={[styles.searchContainer, { backgroundColor: theme.card }]}>

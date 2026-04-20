@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
 import { lecturerService } from '../services/lecturerService';
-
+//Quiz detail screen for lecturer to view quiz details and delete quiz
 export default function QuizDetailScreen({ navigation, route }) {
   const { theme } = useTheme();
   const { quizId } = route.params;

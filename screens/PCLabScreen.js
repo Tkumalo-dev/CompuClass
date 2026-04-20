@@ -35,7 +35,7 @@ export default function PCLabScreen({ navigation }) {
   const [showGPUFullscreen, setShowGPUFullscreen] = useState(false);
   const [showStorageFullscreen, setShowStorageFullscreen] = useState(false);
   const [showPSUFullscreen, setShowPSUFullscreen] = useState(false);
-
+// Define the PC components and assembly steps for the interactive lab
   const components = [
     { id: 'motherboard', name: 'Motherboard', icon: 'hardware-chip' },
     { id: 'cpu', name: 'CPU', icon: 'speedometer' },
@@ -53,7 +53,7 @@ export default function PCLabScreen({ navigation }) {
     'Install Storage',
     'Connect Power Supply',
   ];
-
+// Handle component selection and assembly logic. Check if the selected component matches the expected component for the current step. If correct, move to the next step, if not show an alert. When all steps are completed, show a congratulatory message and option to start a new build.
   const handleComponentPress = (componentId) => {
     if (componentId === 'motherboard') {
       setShowMotherboardFullscreen(true);

@@ -49,7 +49,7 @@ export default function ProfileScreen({ onLogout }) {
     };
     input.click();
   };
-
+// Handle profile update, including name and avatar
   const handleEditProfile = async () => {
     if (!fullName.trim()) {
       Alert.alert('Error', 'Name cannot be empty');
@@ -68,7 +68,7 @@ export default function ProfileScreen({ onLogout }) {
       setLoading(false);
     }
   };
-
+// Handle password change with validation
   const handleChangePassword = async () => {
     if (!newPassword || !confirmPassword) {
       Alert.alert('Error', 'All fields are required');
@@ -122,7 +122,7 @@ export default function ProfileScreen({ onLogout }) {
     { icon: 'person', title: 'Edit Profile', onPress: () => setShowEditModal(true) },
     { icon: 'lock-closed', title: 'Change Password', onPress: () => setShowPasswordModal(true) },
   ];
-
+// Render user profile information and options to edit profile, change password, and logout. Modals are used for editing profile and changing password with appropriate validation and feedback.
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.surface }]}>
       <View style={[styles.profileSection, { backgroundColor: theme.card }]}>

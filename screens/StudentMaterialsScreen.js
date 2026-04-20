@@ -6,7 +6,7 @@ import { downloadAsync, documentDirectory } from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { supabase } from '../config/supabase';
 import { useTheme } from '../context/ThemeContext';
-
+// Student materials screen for students to browse folders containing documents and quizzes. Students can open quizzes in quiz screen and download/share documents. Folders are loaded from Supabase and content is displayed based on selected folder.
 export default function StudentMaterialsScreen({ navigation }) {
   const { theme } = useTheme();
   const [folders, setFolders] = useState([]);
@@ -23,7 +23,7 @@ export default function StudentMaterialsScreen({ navigation }) {
       loadFolderContent(selectedFolder.id);
     }
   }, [selectedFolder]);
-
+// Load folders from Supabase and handle errors
   const loadFolders = async () => {
     try {
       const { data, error } = await supabase.from('folders').select('*').order('created_at', { ascending: false });
@@ -33,7 +33,7 @@ export default function StudentMaterialsScreen({ navigation }) {
       Alert.alert('Error', error.message);
     }
   };
-
+// Load documents and quizzes for the selected folder from Supabase and handle errors
   const loadFolderContent = async (folderId) => {
     try {
       const [docsRes, quizzesRes] = await Promise.all([
@@ -48,14 +48,14 @@ export default function StudentMaterialsScreen({ navigation }) {
       Alert.alert('Error', error.message);
     }
   };
-
+// Handle document opening by downloading the file and sharing it if supported. Show appropriate alerts for errors and success.
   const openDocument = async (doc) => {
     try {
       if (!doc.file_url) {
         Alert.alert('Error', 'No file URL available');
         return;
       }
-
+// Generate a file name and URI for downloading the document
       const fileName = doc.file_name || `${doc.title}.pdf`;
       const fileUri = `${documentDirectory}${fileName}`;
       
@@ -75,7 +75,7 @@ export default function StudentMaterialsScreen({ navigation }) {
       console.error('Download error:', error);
     }
   };
-
+// Handle quiz opening by navigating to quiz screen with selected quiz data
   if (selectedFolder) {
     return (
       <View style={[styles.container, { backgroundColor: theme.surface }]}>

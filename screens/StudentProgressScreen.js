@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
 import { lecturerService } from '../services/lecturerService';
-
+//Student progress screen for lecturer to view student progress and add students to class. Progress data is loaded from Supabase and displayed in a list of student cards. Each card shows student's name, email, quizzes completed, average score, materials viewed and last activity. Lecturer can tap on a student card to view more details in a modal. Lecturer can also add new students by entering their email in a modal form.
 export default function StudentProgressScreen({ navigation }) {
   const { theme } = useTheme();
   const [students, setStudents] = useState([]);
